@@ -48,7 +48,7 @@ export default function InterestedPage() {
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase
       .from('trade_proposals')
-      .update({ status })
+      .update({ status, proposer_seen: false })
       .eq('id', id)
     if (!error) {
       setProposals(prev => prev.map(p => p.id === id ? { ...p, status } : p))

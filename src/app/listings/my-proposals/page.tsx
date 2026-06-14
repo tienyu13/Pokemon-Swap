@@ -18,6 +18,13 @@ export default function MyProposalsPage() {
         return
       }
 
+      // 進入頁面後，標記所有未讀回應為已讀
+      await supabase
+        .from('trade_proposals')
+        .update({ proposer_seen: true })
+        .eq('proposer_id', data.user.id)
+        .eq('proposer_seen', false)
+
       const { data: props } = await supabase
         .from('trade_proposals')
         .select('*')

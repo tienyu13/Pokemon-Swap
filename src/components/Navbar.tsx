@@ -6,36 +6,45 @@ import { supabase } from '@/lib/supabase'
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [pendingCount, setPendingCount] = useState(0)
+  const [proposalBadge, setProposalBadge] = useState(0)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user)
-      if (data.user) fetchPendingCount(data.user.id)
+      if (data.user) fetchBadges(data.user.id)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) fetchPendingCount(session.user.id)
-      else setPendingCount(0)
+      if (session?.user) fetchBadges(session.user.id)
+      else { setPendingCount(0); setProposalBadge(0) }
     })
     return () => subscription.unsubscribe()
   }, [])
 
-  const fetchPendingCount = async (userId: string) => {
+  const fetchBadges = async (userId: string) => {
+    // 有興趣的人：我的上架收到的待處理提議
     const { data: myListings } = await supabase
       .from('listings')
       .select('id')
       .eq('user_id', userId)
 
-    if (!myListings || myListings.length === 0) return
-    const ids = myListings.map((l: any) => l.id)
+    if (myListings && myListings.length > 0) {
+      const ids = myListings.map((l: any) => l.id)
+      const { count } = await supabase
+        .from('trade_proposals')
+        .select('id', { count: 'exact', head: true })
+        .in('listing_id', ids)
+        .eq('status', 'pending')
+      setPendingCount(count ?? 0)
+    }
 
-    const { count } = await supabase
+    // 我的提議：對方已回應但我還沒看
+    const { count: unseenCount } = await supabase
       .from('trade_proposals')
       .select('id', { count: 'exact', head: true })
-      .in('listing_id', ids)
-      .eq('status', 'pending')
-
-    setPendingCount(count ?? 0)
+      .eq('proposer_id', userId)
+      .eq('proposer_seen', false)
+    setProposalBadge(unseenCount ?? 0)
   }
 
   return (
@@ -45,7 +54,7 @@ export default function Navbar() {
         {user && (
           <>
             <a href="/listings/my" className="text-sm text-gray-600 hover:text-gray-900">我的上架</a>
-            <a href="/listings/interested" className="text-sm text-gray-600 hover:text-gray-900 relative inline-flex items-center gap-1">
+            <a href="/listings/interested" className="text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
               有興趣的人
               {pendingCount > 0 && (
                 <span className="inline-flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full">
@@ -53,7 +62,14 @@ export default function Navbar() {
                 </span>
               )}
             </a>
-            <a href="/listings/my-proposals" className="text-sm text-gray-600 hover:text-gray-900">我的提議</a>
+            <a href="/listings/my-proposals" className="text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
+              我的提議
+              {proposalBadge > 0 && (
+                <span className="inline-flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                  {proposalBadge > 9 ? '9+' : proposalBadge}
+                </span>
+              )}
+            </a>
           </>
         )}
       </div>
