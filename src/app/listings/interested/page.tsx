@@ -1,0 +1,190 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Navbar from '@/components/Navbar'
+import { supabase } from '@/lib/supabase'
+
+export default function InterestedPage() {
+  const router = useRouter()
+  const [proposals, setProposals] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) {
+        router.push('/login')
+        return
+      }
+
+      const { data: myListings } = await supabase
+        .from('listings')
+        .select('id, card_name')
+        .eq('user_id', data.user.id)
+
+      if (!myListings || myListings.length === 0) {
+        setLoading(false)
+        return
+      }
+
+      const listingMap = Object.fromEntries(myListings.map(l => [l.id, l.card_name]))
+      const listingIds = myListings.map(l => l.id)
+
+      const { data: props } = await supabase
+        .from('trade_proposals')
+        .select('*')
+        .in('listing_id', listingIds)
+        .order('created_at', { ascending: false })
+
+      setProposals((props ?? []).map(p => ({
+        ...p,
+        my_card_name: listingMap[p.listing_id] ?? '',
+      })))
+      setLoading(false)
+    })
+  }, [router])
+
+  const updateStatus = async (id: string, status: string) => {
+    const { error } = await supabase
+      .from('trade_proposals')
+      .update({ status })
+      .eq('id', id)
+    if (!error) {
+      setProposals(prev => prev.map(p => p.id === id ? { ...p, status } : p))
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!confirmDeleteId) return
+    const { error } = await supabase
+      .from('trade_proposals')
+      .delete()
+      .eq('id', confirmDeleteId)
+    if (!error) {
+      setProposals(prev => prev.filter(p => p.id !== confirmDeleteId))
+    }
+    setConfirmDeleteId(null)
+  }
+
+  if (loading) return null
+
+  return (
+    <main className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      <div className="max-w-2xl mx-auto py-12 px-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">有興趣的人</h2>
+
+        {proposals.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="text-2xl font-bold text-gray-700">還沒有人提議交換</p>
+            <p className="text-sm text-gray-400 mt-2">當有人對你的卡片有興趣時，會出現在這裡</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {proposals.map(p => (
+              <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-5">
+
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">針對你的卡片</p>
+                    <p className="font-bold text-gray-900">{p.my_card_name}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+                      p.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                      p.status === 'accepted' ? 'bg-green-100 text-green-700' :
+                      'bg-gray-100 text-gray-500'
+                    }`}>
+                      {p.status === 'pending' ? '待處理' : p.status === 'accepted' ? '已接受' : '已婉拒'}
+                    </span>
+                    <button
+                      onClick={() => setConfirmDeleteId(p.id)}
+                      className="text-2xl leading-none hover:scale-110 transition-transform"
+                      title="刪除"
+                    >
+                      ❌
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-xs font-bold text-red-500 flex-shrink-0">
+                    {p.proposer_name?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">{p.proposer_name || '匿名'}</span>
+                </div>
+
+                {p.offer_type === 'card' && (
+                  <div className="flex gap-3 items-center bg-gray-50 rounded-xl p-3 mb-3">
+                    {p.offered_card_image && (
+                      <img src={p.offered_card_image} alt={p.offered_card_name} className="w-12 rounded-lg flex-shrink-0" />
+                    )}
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">提議交換的卡片</p>
+                      <p className="text-sm font-medium text-gray-800">{p.offered_card_name || '未指定'}</p>
+                    </div>
+                  </div>
+                )}
+
+                {p.offer_type === 'chat' && (
+                  <div className="bg-blue-50 rounded-xl p-3 mb-3">
+                    <p className="text-sm text-blue-700 font-medium">希望私聊討論</p>
+                  </div>
+                )}
+
+                {p.message && (
+                  <div className="bg-gray-50 rounded-xl p-3 mb-4">
+                    <p className="text-xs text-gray-400 mb-1">備註</p>
+                    <p className="text-sm text-gray-700">{p.message}</p>
+                  </div>
+                )}
+
+                {p.status === 'pending' && (
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => updateStatus(p.id, 'accepted')}
+                      className="flex-1 py-2 bg-green-500 text-white text-sm rounded-xl font-medium hover:bg-green-600 transition-colors"
+                    >
+                      接受
+                    </button>
+                    <button
+                      onClick={() => updateStatus(p.id, 'rejected')}
+                      className="flex-1 py-2 border border-gray-300 text-gray-600 text-sm rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      婉拒
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {confirmDeleteId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
+            <p className="text-lg font-bold text-gray-900 mb-2">確認刪除？</p>
+            <p className="text-sm text-gray-500 mb-6">刪除後將無法復原</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="flex-1 py-2.5 border border-gray-300 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50"
+              >
+                我再想想
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-medium hover:bg-red-600"
+              >
+                刪除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+  )
+}

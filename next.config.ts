@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["images.pokemontcg.io"],
+  },
+  allowedDevOrigins: ["anyone-survey-tinker.ngrok-free.dev"],
 };
 
 export default nextConfig;
