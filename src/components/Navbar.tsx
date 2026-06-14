@@ -5,18 +5,37 @@ import { supabase } from '@/lib/supabase'
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
+  const [pendingCount, setPendingCount] = useState(0)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      if (data.user) fetchPendingCount(data.user.id)
+    })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) fetchPendingCount(session.user.id)
+      else setPendingCount(0)
     })
     return () => subscription.unsubscribe()
   }, [])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
+  const fetchPendingCount = async (userId: string) => {
+    const { data: myListings } = await supabase
+      .from('listings')
+      .select('id')
+      .eq('user_id', userId)
+
+    if (!myListings || myListings.length === 0) return
+    const ids = myListings.map((l: any) => l.id)
+
+    const { count } = await supabase
+      .from('trade_proposals')
+      .select('id', { count: 'exact', head: true })
+      .in('listing_id', ids)
+      .eq('status', 'pending')
+
+    setPendingCount(count ?? 0)
   }
 
   return (
@@ -26,22 +45,26 @@ export default function Navbar() {
         {user && (
           <>
             <a href="/listings/my" className="text-sm text-gray-600 hover:text-gray-900">我的上架</a>
-            <a href="/listings/interested" className="text-sm text-gray-600 hover:text-gray-900">有興趣的人</a>
+            <a href="/listings/interested" className="text-sm text-gray-600 hover:text-gray-900 relative inline-flex items-center gap-1">
+              有興趣的人
+              {pendingCount > 0 && (
+                <span className="inline-flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                  {pendingCount > 9 ? '9+' : pendingCount}
+                </span>
+              )}
+            </a>
             <a href="/listings/my-proposals" className="text-sm text-gray-600 hover:text-gray-900">我的提議</a>
           </>
         )}
       </div>
       <div className="flex gap-3 items-center">
         {user ? (
-          <>
+          <a href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-sm font-bold text-white">
+              {user.email?.[0]?.toUpperCase() ?? '?'}
+            </div>
             <span className="text-sm text-gray-600 hidden md:block">{user.email}</span>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              登出
-            </button>
-          </>
+          </a>
         ) : (
           <>
             <a href="/login" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">登入</a>
