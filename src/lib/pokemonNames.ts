@@ -70,9 +70,6 @@ export const chineseToEnglish: Record<string, string> = {
   // 盧卡利歐
   '盧卡利歐': 'Lucario', '利歐路': 'Riolu',
 
-  // 甲賀忍蛙
-  '甲賀忍蛙ex': 'Greninja ex',
-
   // 達克萊伊
   '達克萊伊': 'Darkrai',
 
@@ -83,7 +80,7 @@ export const chineseToEnglish: Record<string, string> = {
   '迷你龍': 'Dratini', '哈克龍': 'Dragonair', '快龍': 'Dragonite',
   '鯉魚王': 'Magikarp', '暴鯉龍': 'Gyarados',
 
-  // 超夢ex
+  // ex 版本
   '超夢ex': 'Mewtwo ex', '皮卡丘ex': 'Pikachu ex', '噴火龍ex': 'Charizard ex',
   '甲賀忍蛙ex': 'Greninja ex', '沙奈朵ex': 'Gardevoir ex',
   '盧卡利歐ex': 'Lucario ex', '耿鬼ex': 'Gengar ex', '烈空坐ex': 'Rayquaza ex',
@@ -98,13 +95,12 @@ export const chineseToEnglish: Record<string, string> = {
 
   // 神獸第三世代
   '雷吉洛克': 'Regirock', '雷吉艾斯': 'Regice', '雷吉斯奇魯': 'Registeel',
-  '拉帝歐斯': 'Latios', '拉帝亞斯': 'Latias',
-  '烈空坐': 'Rayquaza', '代歐奇希斯': 'Deoxys',
+  '代歐奇希斯': 'Deoxys',
 
   // 神獸第四世代
   '帝牙盧卡': 'Dialga', '帕路奇亞': 'Palkia', '騎拉帝納': 'Giratina',
   '克雷色利亞': 'Cresselia', '真實繆斯': 'Manaphy', '夢那': 'Phione',
-  '達克萊伊': 'Darkrai', '謝米': 'Shaymin', '阿爾宙斯': 'Arceus',
+  '謝米': 'Shaymin', '阿爾宙斯': 'Arceus',
 
   // 神獸第五世代
   '維克提尼': 'Victini', '科巴魯基': 'Cobalion', '特納多': 'Terrakion',
@@ -129,9 +125,6 @@ export const chineseToEnglish: Record<string, string> = {
   '故勒頓': 'Koraidon', '密勒頓': 'Miraidon',
   '走電狗': 'Iron Hands', '鐵荊棘': 'Iron Thorns',
 
-  // 劍盾系列
-  '蒼響': 'Zacian', '藏瑪然特': 'Zamazenta',
-
   // 妖精系列
   '仙子': 'Clefairy', '皮可西': 'Clefable',
 
@@ -144,7 +137,6 @@ export const chineseToEnglish: Record<string, string> = {
   '催眠貘': 'Drowzee', '胡地': 'Alakazam', '怪力': 'Machamp',
   '電擊獸': 'Electabuzz', '鴨嘴火龍': 'Magmar',
   '食夢夢': 'Munna', '夢夢蝕': 'Musharna',
-  '黑色庫': 'Darkrai',
 }
 
 export function toEnglishName(input: string): string {
