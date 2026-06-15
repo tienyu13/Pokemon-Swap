@@ -8,14 +8,14 @@ import { useRouter } from 'next/navigation'
 export default function NewListing() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     card_name: '',
     set_name: '',
     condition: 'NM',
     rarity: '',
     wants: '',
-    user_name: '',
-  })
+    user_name: typeof window !== 'undefined' ? (localStorage.getItem('pokeswap_user_name') ?? '') : '',
+  }))
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [uploadedPreview, setUploadedPreview] = useState('')
@@ -31,8 +31,6 @@ export default function NewListing() {
         router.push('/login')
       } else {
         setUserId(data.user.id)
-        const savedName = localStorage.getItem('pokeswap_user_name')
-        if (savedName) setForm(f => ({ ...f, user_name: savedName }))
       }
     })
   }, [router])
