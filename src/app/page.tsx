@@ -26,10 +26,23 @@ export default function Home() {
       .limit(8)
       .then(({ data }) => setListings(data ?? []))
 
-    fetch('https://api.pokemontcg.io/v2/cards?q=rarity:"Special Illustration Rare"&orderBy=-set.releaseDate&pageSize=8')
-      .then(r => r.json())
-      .then(d => setCards(d.data ?? []))
-      .catch(() => {})
+    const fetchFeaturedCards = async () => {
+      try {
+        const [greninjaRes, darkraiRes, recentRes] = await Promise.all([
+          fetch('https://api.pokemontcg.io/v2/cards?q=name:Greninja rarity:"Special Illustration Rare"&pageSize=2'),
+          fetch('https://api.pokemontcg.io/v2/cards?q=name:Darkrai rarity:"Special Illustration Rare"&pageSize=2'),
+          fetch('https://api.pokemontcg.io/v2/cards?q=rarity:"Special Illustration Rare"&orderBy=-set.releaseDate&pageSize=8'),
+        ])
+        const [g, d, r] = await Promise.all([greninjaRes.json(), darkraiRes.json(), recentRes.json()])
+        const pinned = [...(g.data ?? []), ...(d.data ?? [])]
+        const pinnedIds = new Set(pinned.map((c: any) => c.id))
+        const rest = (r.data ?? []).filter((c: any) => !pinnedIds.has(c.id))
+        setCards([...pinned, ...rest].slice(0, 8))
+      } catch {
+        setCards([])
+      }
+    }
+    fetchFeaturedCards()
   }, [])
 
   return (
