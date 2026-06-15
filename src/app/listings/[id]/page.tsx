@@ -307,11 +307,11 @@ export default function ListingDetailPage() {
 
                 <div className="mb-5">
                   <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    備註訊息 <span className="text-gray-400 font-normal">（選填，可留聯絡方式）</span>
+                    聯絡方式 <span className="text-red-500 font-normal">（必填）</span>
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="例：我的 Line ID 是 xxx，歡迎私訊討論"
+                    placeholder="例：Line ID：xxx / IG：@xxx / 手機：09xx-xxx-xxx"
                     value={proposalMessage}
                     onChange={e => setProposalMessage(e.target.value)}
                     className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-black focus:outline-none focus:border-red-400 resize-none"
@@ -320,7 +320,7 @@ export default function ListingDetailPage() {
 
                 <button
                   onClick={handleSubmitProposal}
-                  disabled={proposalLoading || (offerType === 'card' && !selectedCardId)}
+                  disabled={proposalLoading || (offerType === 'card' && !selectedCardId) || !proposalMessage.trim()}
                   className="w-full py-3 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {proposalLoading ? '送出中...' : '送出提議'}
