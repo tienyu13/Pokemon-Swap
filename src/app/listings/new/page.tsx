@@ -184,6 +184,22 @@ export default function NewListing() {
               onChange={(e) => setForm({ ...form, set_name: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-black focus:outline-none focus:border-red-400"
             />
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {['深淵之瞳', '忍者飛旋'].map(name => (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => setForm({ ...form, set_name: name })}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    form.set_name === name
+                      ? 'bg-red-500 text-white border-red-500'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-red-400'
+                  }`}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
