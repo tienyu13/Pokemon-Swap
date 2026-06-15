@@ -85,24 +85,53 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="bg-white py-12 px-6 border-b border-gray-100">
+      <section className="bg-white py-14 px-6 border-b border-gray-100">
         <div className="max-w-3xl mx-auto">
-          <h3 className="text-lg font-bold text-gray-900 text-center mb-8">怎麼交換？</h3>
-          <div className="grid grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">📤</div>
-              <p className="font-medium text-gray-900 text-sm">上架你的卡</p>
-              <p className="text-xs text-gray-400 mt-1">拍照上傳，填寫想換的卡</p>
+          <h3 className="text-xl font-bold text-gray-900 text-center mb-12">怎麼交換？</h3>
+          <div className="grid grid-cols-3 gap-8 text-center relative">
+            {/* connector line */}
+            <div className="absolute top-10 left-[22%] right-[22%] h-px bg-gray-200 hidden md:block" />
+
+            {/* Step 1 */}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-5">
+                <div className="w-20 h-20 rounded-full border-2 border-gray-200 flex items-center justify-center bg-white">
+                  <svg className="w-9 h-9 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                  </svg>
+                </div>
+                <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">1</span>
+              </div>
+              <p className="font-semibold text-gray-900 mb-1">上架你的卡</p>
+              <p className="text-xs text-gray-400 leading-relaxed">拍照上傳，填寫想換的卡</p>
             </div>
-            <div>
-              <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">🤝</div>
-              <p className="font-medium text-gray-900 text-sm">提議交換</p>
-              <p className="text-xs text-gray-400 mt-1">找到想要的卡，送出提議</p>
+
+            {/* Step 2 */}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-5">
+                <div className="w-20 h-20 rounded-full border-2 border-gray-200 flex items-center justify-center bg-white">
+                  <svg className="w-9 h-9 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                  </svg>
+                </div>
+                <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">2</span>
+              </div>
+              <p className="font-semibold text-gray-900 mb-1">提議交換</p>
+              <p className="text-xs text-gray-400 leading-relaxed">找到想要的卡，送出提議</p>
             </div>
-            <div>
-              <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">✅</div>
-              <p className="font-medium text-gray-900 text-sm">完成交換</p>
-              <p className="text-xs text-gray-400 mt-1">雙方聯絡，安排交換</p>
+
+            {/* Step 3 */}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-5">
+                <div className="w-20 h-20 rounded-full border-2 border-gray-200 flex items-center justify-center bg-white">
+                  <svg className="w-9 h-9 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+                <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">3</span>
+              </div>
+              <p className="font-semibold text-gray-900 mb-1">完成交換</p>
+              <p className="text-xs text-gray-400 leading-relaxed">雙方聯絡，安排交換</p>
             </div>
           </div>
         </div>
