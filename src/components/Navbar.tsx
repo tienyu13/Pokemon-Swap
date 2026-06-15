@@ -85,10 +85,7 @@ export default function Navbar() {
               <span className="text-sm text-gray-600 hidden md:block">{user.email}</span>
             </a>
           ) : (
-            <div className="hidden md:flex gap-3">
-              <a href="/login" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">登入</a>
-              <a href="/login" className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600">註冊</a>
-            </div>
+            <a href="/login" className="hidden md:block px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600">登入</a>
           )}
 
           {/* Hamburger */}
@@ -132,10 +129,7 @@ export default function Navbar() {
               <a href="/search" className="text-sm text-gray-700 py-1" onClick={() => setMenuOpen(false)}>搜尋卡片</a>
             </>
           ) : (
-            <>
-              <a href="/login" className="text-sm text-gray-700 py-1" onClick={() => setMenuOpen(false)}>登入</a>
-              <a href="/login" className="text-sm font-medium text-red-500 py-1" onClick={() => setMenuOpen(false)}>註冊</a>
-            </>
+            <a href="/login" className="text-sm font-medium text-red-500 py-1" onClick={() => setMenuOpen(false)}>登入</a>
           )}
         </div>
       )}
