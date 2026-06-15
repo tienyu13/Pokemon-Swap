@@ -37,17 +37,17 @@ export default function Home() {
 
       <Navbar />
 
-      <section className="bg-gray-900 px-6 py-16">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-12">
+      <section className="bg-gray-900 px-6 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-8">
           <div>
-            <h2 className="text-4xl font-bold text-white mb-4">找到你缺的那張卡</h2>
-            <p className="text-lg text-gray-400 mb-8">台灣最大寶可夢卡牌交換社群，安全 · 公平 · 純交換</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">找到你缺的那張卡</h2>
+            <p className="text-base md:text-lg text-gray-400 mb-6">台灣最大寶可夢卡牌交換社群，安全 · 公平 · 純交換</p>
             <div className="flex gap-3">
-              <Link href="/search" className="px-6 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600">瀏覽卡片</Link>
-              <Link href="/listings/new" className="px-6 py-3 border border-white text-white rounded-lg font-medium hover:bg-white hover:text-gray-900 transition-colors">上架我的卡</Link>
+              <Link href="/search" className="px-5 py-2.5 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 text-sm md:text-base">瀏覽卡片</Link>
+              <Link href="/listings/new" className="px-5 py-2.5 border border-white text-white rounded-lg font-medium hover:bg-white hover:text-gray-900 transition-colors text-sm md:text-base">上架我的卡</Link>
             </div>
           </div>
-          <div className="flex gap-3 flex-shrink-0">
+          <div className="flex gap-3 justify-center md:justify-end flex-shrink-0">
             {[0, 1, 2].map((offset) => {
               const card = cards[(slideIndex + offset) % cards.length]
               if (!card) return null
@@ -56,7 +56,7 @@ export default function Home() {
                   key={card.id}
                   src={card.images.small}
                   alt={card.name}
-                  className="w-28 rounded-xl shadow-2xl"
+                  className="w-20 md:w-28 rounded-xl shadow-2xl"
                   style={{ opacity: offset === 1 ? 1 : 0.5 }}
                 />
               )
