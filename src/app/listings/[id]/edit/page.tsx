@@ -62,8 +62,8 @@ export default function EditListingPage() {
     setUploadError('')
     const file = e.target.files?.[0]
     if (!file) return
-    if (!file.type.startsWith('image/')) {
-      setUploadError('請上傳圖片檔案')
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      setUploadError('只接受 JPG 或 PNG 格式')
       return
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -181,7 +181,7 @@ export default function EditListingPage() {
             )}
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png"
               onChange={handleFileChange}
               className="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
             />
