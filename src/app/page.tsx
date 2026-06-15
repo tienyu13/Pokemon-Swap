@@ -53,6 +53,11 @@ export default function Home() {
                 <p className="text-2xl font-bold text-white">{listings.length}+</p>
                 <p className="text-xs text-gray-400">上架中</p>
               </div>
+              <div className="w-px bg-gray-700" />
+              <div>
+                <p className="text-2xl font-bold text-white">24H</p>
+                <p className="text-xs text-gray-400">全天可交換</p>
+              </div>
             </div>
           </div>
           <div className="flex gap-3 justify-center md:justify-end flex-shrink-0">
