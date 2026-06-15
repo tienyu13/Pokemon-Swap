@@ -31,6 +31,8 @@ export default function NewListing() {
         router.push('/login')
       } else {
         setUserId(data.user.id)
+        const savedName = localStorage.getItem('pokeswap_user_name')
+        if (savedName) setForm(f => ({ ...f, user_name: savedName }))
       }
     })
   }, [router])
@@ -99,6 +101,7 @@ export default function NewListing() {
     if (error) {
       setError(error.message)
     } else {
+      localStorage.setItem('pokeswap_user_name', form.user_name)
       setSuccess(true)
     }
   }
