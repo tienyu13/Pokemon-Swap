@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function Navbar() {
@@ -8,19 +8,7 @@ export default function Navbar() {
   const [pendingCount, setPendingCount] = useState(0)
   const [proposalBadge, setProposalBadge] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user)
-      if (data.user) fetchBadges(data.user.id)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchBadges(session.user.id)
-      else { setPendingCount(0); setProposalBadge(0) }
-    })
-    return () => subscription.unsubscribe()
-  }, [])
+  const userIdRef = useRef<string | null>(null)
 
   const fetchBadges = async (userId: string) => {
     const { data: myListings } = await supabase
@@ -36,6 +24,8 @@ export default function Navbar() {
         .in('listing_id', ids)
         .eq('status', 'pending')
       setPendingCount(count ?? 0)
+    } else {
+      setPendingCount(0)
     }
 
     const { count: unseenCount } = await supabase
@@ -45,6 +35,44 @@ export default function Navbar() {
       .eq('proposer_seen', false)
     setProposalBadge(unseenCount ?? 0)
   }
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      if (data.user) {
+        userIdRef.current = data.user.id
+        fetchBadges(data.user.id)
+      }
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        userIdRef.current = session.user.id
+        fetchBadges(session.user.id)
+      } else {
+        userIdRef.current = null
+        setPendingCount(0)
+        setProposalBadge(0)
+      }
+    })
+
+    const channel = supabase
+      .channel('trade-proposals-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'trade_proposals' },
+        () => {
+          if (userIdRef.current) fetchBadges(userIdRef.current)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      subscription.unsubscribe()
+      supabase.removeChannel(channel)
+    }
+  }, [])
 
   return (
     <nav className="bg-white border-b border-gray-200">
