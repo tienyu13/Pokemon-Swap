@@ -46,8 +46,8 @@ export default function NewListing() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      setUploadError('只接受 JPG 或 PNG 格式')
+    if (!file.type.startsWith('image/')) {
+      setUploadError('請上傳圖片檔案')
       return
     }
 
@@ -151,11 +151,11 @@ export default function NewListing() {
             <label className="block text-sm font-medium text-gray-700 mb-1">上傳卡片照片</label>
             <input
               type="file"
-              accept="image/jpeg,image/png"
+              accept="image/*"
               onChange={handleFileChange}
               className="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
             />
-            <p className="text-xs text-gray-400 mt-1">JPG / PNG，最大 10MB</p>
+            <p className="text-xs text-gray-400 mt-1">支援所有圖片格式，最大 10MB</p>
             {uploadError && <p className="text-red-500 text-xs mt-1">{uploadError}</p>}
             {uploadedPreview && (
               <div className="mt-3 flex items-center gap-3">
