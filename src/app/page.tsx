@@ -20,12 +20,20 @@ export default function Home() {
   }, [cards])
 
   useEffect(() => {
+    const rarityRank: Record<string, number> = {
+      HR: 9, UR: 8, SAR: 7, SR: 6, AR: 5, RR: 4, R: 3, U: 2, C: 1, PR: 1,
+    }
     supabase
       .from('listings')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(8)
-      .then(({ data }) => setListings(data ?? []))
+      .limit(32)
+      .then(({ data }) => {
+        const sorted = (data ?? []).sort((a, b) =>
+          (rarityRank[b.rarity] ?? 0) - (rarityRank[a.rarity] ?? 0)
+        )
+        setListings(sorted.slice(0, 8))
+      })
 
     fetch('https://api.pokemontcg.io/v2/cards?q=rarity:"Special Illustration Rare"&orderBy=-set.releaseDate&pageSize=8')
       .then(r => r.json())
