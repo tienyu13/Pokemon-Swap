@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const [listings, setListings] = useState<any[]>([])
   const [sentProposals, setSentProposals] = useState<any[]>([])
   const [acceptedProposals, setAcceptedProposals] = useState<any[]>([])
+  const [reviews, setReviews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -18,15 +19,17 @@ export default function ProfilePage() {
       if (!data.user) { router.push('/login'); return }
       setUser(data.user)
 
-      const [listingsRes, sentRes] = await Promise.all([
+      const [listingsRes, sentRes, reviewsRes] = await Promise.all([
         supabase.from('listings').select('*').eq('user_id', data.user.id).order('created_at', { ascending: false }),
         supabase.from('trade_proposals').select('*, listings(card_name, image_url)').eq('proposer_id', data.user.id).order('created_at', { ascending: false }),
+        supabase.from('reviews').select('*').eq('reviewee_id', data.user.id).order('created_at', { ascending: false }),
       ])
 
       setListings(listingsRes.data ?? [])
       const sent = sentRes.data ?? []
       setSentProposals(sent.filter((p: any) => p.status !== 'accepted'))
       setAcceptedProposals(sent.filter((p: any) => p.status === 'accepted'))
+      setReviews(reviewsRes.data ?? [])
       setLoading(false)
     })
   }, [router])
@@ -39,6 +42,9 @@ export default function ProfilePage() {
   if (loading) return null
 
   const initials = user?.email?.[0]?.toUpperCase() ?? '?'
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : null
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -53,7 +59,12 @@ export default function ProfilePage() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-gray-900 text-lg truncate">{user?.email}</p>
-            <p className="text-sm text-gray-400 mt-0.5">上架 {listings.length} 張 · 提議 {sentProposals.length + acceptedProposals.length} 次</p>
+            <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+              <p className="text-sm text-gray-400">上架 {listings.length} 張 · 提議 {sentProposals.length + acceptedProposals.length} 次</p>
+              {avgRating && (
+                <span className="text-sm text-yellow-500 font-medium">★ {avgRating} <span className="text-gray-400 font-normal">({reviews.length} 則評價)</span></span>
+              )}
+            </div>
           </div>
           <button
             onClick={handleLogout}
@@ -122,6 +133,35 @@ export default function ProfilePage() {
                     <p className="text-xs text-green-600 mt-0.5">已接受交換</p>
                     {p.message && <p className="text-xs text-gray-500 mt-0.5">{p.message}</p>}
                   </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Received reviews */}
+        {reviews.length > 0 && (
+          <section className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="font-bold text-gray-900">收到的評價</h3>
+              <span className="text-yellow-500 font-bold text-sm">★ {avgRating}</span>
+              <span className="text-xs text-gray-400">({reviews.length} 則)</span>
+            </div>
+            <div className="flex flex-col gap-3">
+              {reviews.slice(0, 5).map((r: any) => (
+                <div key={r.id} className="bg-white border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-500">
+                        {r.reviewer_name?.[0]?.toUpperCase() ?? '?'}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">{r.reviewer_name || '匿名'}</span>
+                    </div>
+                    <span className="text-yellow-400 text-sm tracking-tight">
+                      {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                    </span>
+                  </div>
+                  {r.comment && <p className="text-sm text-gray-600">{r.comment}</p>}
                 </div>
               ))}
             </div>

@@ -20,6 +20,7 @@ export default function ListingDetailPage() {
 
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [authLoading, setAuthLoading] = useState(true)
+  const [sellerRating, setSellerRating] = useState<{ avg: number; count: number } | null>(null)
 
   // Proposal modal
   const [showModal, setShowModal] = useState(false)
@@ -43,6 +44,18 @@ export default function ListingDetailPage() {
       .then(({ data }) => {
         setListing(data)
         setLoading(false)
+        if (data?.user_id) {
+          supabase
+            .from('reviews')
+            .select('rating')
+            .eq('reviewee_id', data.user_id)
+            .then(({ data: revs }) => {
+              if (revs && revs.length > 0) {
+                const avg = revs.reduce((s: number, r: any) => s + r.rating, 0) / revs.length
+                setSellerRating({ avg, count: revs.length })
+              }
+            })
+        }
       })
   }, [id])
 
@@ -210,7 +223,12 @@ export default function ListingDetailPage() {
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-sm font-bold text-red-500">
                 {listing.user_name?.[0]?.toUpperCase() ?? '?'}
               </div>
-              <span className="text-sm text-gray-600">{listing.user_name}</span>
+              <div>
+                <span className="text-sm text-gray-600">{listing.user_name}</span>
+                {sellerRating && (
+                  <span className="ml-2 text-xs text-yellow-500 font-medium">★ {sellerRating.avg.toFixed(1)} ({sellerRating.count})</span>
+                )}
+              </div>
             </div>
 
             {!isOwnListing && (
