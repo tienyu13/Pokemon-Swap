@@ -86,13 +86,21 @@ export default function MyListingsPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleDelete(listing.id)}
-                  disabled={deletingId === listing.id}
-                  className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 flex-shrink-0"
-                >
-                  {deletingId === listing.id ? '下架中...' : '下架'}
-                </button>
+                <div className="flex gap-2 flex-shrink-0">
+                  <a
+                    href={`/listings/${listing.id}/edit`}
+                    className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  >
+                    修改
+                  </a>
+                  <button
+                    onClick={() => handleDelete(listing.id)}
+                    disabled={deletingId === listing.id}
+                    className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50"
+                  >
+                    {deletingId === listing.id ? '下架中...' : '下架'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
